@@ -14,40 +14,19 @@ export type Scalars = {
 
 export type Query = {
   __typename?: 'Query';
-  posts: Array<Post>;
-  post?: Maybe<Post>;
-  createPost: Post;
   me?: Maybe<User>;
   users: Array<User>;
   user?: Maybe<User>;
 };
 
 
-export type QueryPostArgs = {
-  id: Scalars['Int'];
-};
-
-
-export type QueryCreatePostArgs = {
-  title: Scalars['String'];
-};
-
-
 export type QueryUserArgs = {
-  id: Scalars['Int'];
-};
-
-export type Post = {
-  __typename?: 'Post';
-  id: Scalars['Int'];
-  createdAt: Scalars['String'];
-  updatedAt: Scalars['String'];
-  title: Scalars['String'];
+  id: Scalars['String'];
 };
 
 export type User = {
   __typename?: 'User';
-  id: Scalars['Int'];
+  id: Scalars['String'];
   username: Scalars['String'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
@@ -55,24 +34,11 @@ export type User = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  updatePost?: Maybe<Post>;
-  deletePost: Scalars['Boolean'];
   login: UserResponse;
   createUser: UserResponse;
-  updateUser?: Maybe<User>;
   deleteUser: Scalars['Boolean'];
   logout: Scalars['Boolean'];
-};
-
-
-export type MutationUpdatePostArgs = {
-  title: Scalars['String'];
-  id: Scalars['Int'];
-};
-
-
-export type MutationDeletePostArgs = {
-  id: Scalars['Int'];
+  changePassword: UserResponse;
 };
 
 
@@ -86,14 +52,13 @@ export type MutationCreateUserArgs = {
 };
 
 
-export type MutationUpdateUserArgs = {
-  password: Scalars['String'];
-  id: Scalars['Int'];
+export type MutationDeleteUserArgs = {
+  id: Scalars['String'];
 };
 
 
-export type MutationDeleteUserArgs = {
-  id: Scalars['Int'];
+export type MutationChangePasswordArgs = {
+  options: ChangePasswordInput;
 };
 
 export type UserResponse = {
@@ -112,6 +77,32 @@ export type UsernamePasswordInput = {
   username: Scalars['String'];
   password: Scalars['String'];
 };
+
+export type ChangePasswordInput = {
+  id: Scalars['String'];
+  password: Scalars['String'];
+  newPassword: Scalars['String'];
+  newPassword2: Scalars['String'];
+};
+
+export type ChangePasswordMutationVariables = Exact<{
+  options: ChangePasswordInput;
+}>;
+
+
+export type ChangePasswordMutation = (
+  { __typename?: 'Mutation' }
+  & { changePassword: (
+    { __typename?: 'UserResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'field' | 'message'>
+    )>>, user?: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'username'>
+    )> }
+  ) }
+);
 
 export type LoginMutationVariables = Exact<{
   options: UsernamePasswordInput;
@@ -172,6 +163,24 @@ export type MeQuery = (
 );
 
 
+export const ChangePasswordDocument = gql`
+    mutation ChangePassword($options: ChangePasswordInput!) {
+  changePassword(options: $options) {
+    errors {
+      field
+      message
+    }
+    user {
+      id
+      username
+    }
+  }
+}
+    `;
+
+export function useChangePasswordMutation() {
+  return Urql.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument);
+};
 export const LoginDocument = gql`
     mutation Login($options: UsernamePasswordInput!) {
   login(options: $options) {
